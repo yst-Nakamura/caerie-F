@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>かえりえ上北沢 管理者ポータル</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#090401;--ocean:#91B9C1;--sky:#C3DCF0;--sand:#C19569;--mist:#D8DDE1;
+  --ok:#5F8C8A;--warn-bg:#fffbf5;--danger-bg:#fff5f5;--ok-bg:#f3faf9;
+  --bg:#f5f7f9;--card:#fff;--border:#e0e4e8;--text:#1a1a1a;--sub:#666;
+}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.7;min-height:100vh}
+
+/* ══ トップナビ ══ */
+.topnav{background:var(--ink);position:sticky;top:0;z-index:200;display:flex;align-items:stretch}
+.topnav-brand{padding:.875rem 1.5rem;color:#fff;font-size:14px;font-weight:700;white-space:nowrap;display:flex;align-items:center;gap:.5rem;border-right:1px solid rgba(255,255,255,.1)}
+.topnav-brand span{opacity:.6;font-weight:400}
+.topnav-tabs{display:flex;flex:1;overflow-x:auto}
+.topnav-tab{padding:.875rem 1.5rem;color:rgba(255,255,255,.6);font-size:13px;font-weight:500;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all .15s;display:flex;align-items:center;gap:.5rem;user-select:none}
+.topnav-tab:hover{color:#fff;background:rgba(255,255,255,.06)}
+.topnav-tab.active{color:#fff;border-bottom-color:var(--ocean);background:rgba(145,185,193,.12)}
+.tab-icon{font-size:16px}
+
+/* ══ ページ共通 ══ */
+.page{display:none;animation:fadeIn .2s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══ マニュアルページ ══ */
+.manual-layout{display:flex;min-height:calc(100vh - 48px)}
+.manual-sidebar{width:240px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);position:sticky;top:48px;height:calc(100vh - 48px);overflow-y:auto}
+.manual-main{flex:1;padding:2rem 2.5rem;max-width:860px}
+.nav-section{padding:.6rem 1rem .2rem;font-size:10px;font-weight:700;color:var(--sub);letter-spacing:.08em}
+.nav-link{display:block;padding:.55rem 1.25rem;font-size:13px;color:var(--sub);text-decoration:none;border-left:3px solid transparent;transition:all .12s}
+.nav-link:hover{color:var(--text);border-left-color:var(--mist);background:#f8f9fa}
+.nav-link.active{color:var(--text);border-left-color:var(--ocean);background:#f0f9fb;font-weight:500}
+
+/* ══ セクション共通 ══ */
+.page-hero{background:var(--ink);color:#fff;border-radius:12px;padding:1.5rem 2rem;margin-bottom:1.75rem}
+.page-hero h2{font-size:20px;font-weight:700}
+.page-hero p{font-size:12px;opacity:.55;margin-top:.4rem}
+.sec{margin-bottom:2.25rem}
+.sec-title{font-size:17px;font-weight:700;color:var(--ink);padding-bottom:.5rem;border-bottom:2px solid var(--ocean);margin-bottom:1.1rem;scroll-margin-top:60px}
+.sub-title{font-size:14px;font-weight:700;margin:1.1rem 0 .7rem;padding-left:.7rem;border-left:3px solid var(--ocean)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:1.1rem 1.4rem;margin-bottom:.875rem}
+.card-warn{border-left:4px solid var(--sand);background:var(--warn-bg)}
+.card-danger{border-left:4px solid #A32D2D;background:var(--danger-bg)}
+.card-ok{border-left:4px solid var(--ok);background:var(--ok-bg)}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:.875rem}
+th{background:var(--ink);color:#fff;padding:7px 11px;text-align:left;font-weight:500;font-size:12px}
+td{padding:7px 11px;border-bottom:1px solid var(--border);font-size:13px}
+tr:nth-child(even) td{background:#f8f9fa}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500}
+.b-blue{background:#EBF4F8;color:#0C447C}
+.b-green{background:#EAF3DE;color:#3B6D11}
+.b-orange{background:#FAEEDA;color:#854F0B}
+.b-red{background:#FCEBEB;color:#A32D2D}
+.b-teal{background:#E1F5EE;color:#085041}
+.link-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;background:var(--sky);color:var(--ink);border-radius:6px;text-decoration:none;font-size:12px;font-weight:500;transition:opacity .15s;margin:3px 3px 3px 0}
+.link-btn:hover{opacity:.8}
+.link-btns{display:flex;flex-wrap:wrap;gap:3px;margin-top:.7rem}
+.flow{display:flex;flex-direction:column;gap:.4rem}
+.flow-step{display:flex;align-items:flex-start;gap:.65rem;padding:.7rem 1rem;background:var(--card);border:1px solid var(--border);border-radius:7px;font-size:13px}
+.flow-num{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--ocean);color:var(--ink);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-top:1px}
+.flow-arrow{text-align:center;color:var(--ocean);font-size:16px;line-height:1}
+.checklist{list-style:none}
+.checklist li{padding:.35rem 0;display:flex;gap:.5rem;align-items:flex-start;font-size:13px;border-bottom:1px solid #f0f0f0}
+.checklist li::before{content:"□";color:var(--ocean);flex-shrink:0;font-size:15px;line-height:1.3}
+.index-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:.65rem}
+.idx{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:.8rem 1rem;cursor:pointer;text-decoration:none;color:var(--text);display:block;transition:all .12s}
+.idx:hover{border-color:var(--ocean);background:#f0f9fb}
+.idx .i-tag{font-size:10px;color:var(--sub);margin-bottom:3px}
+.idx .i-lbl{font-size:13px;font-weight:500}
+
+/* ══ テストページ ══ */
+.test-wrap{max-width:700px;margin:0 auto;padding:1.5rem}
+.test-header{background:var(--ink);color:#fff;border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.test-header .t-title{font-size:17px;font-weight:700}
+.test-header .t-sub{font-size:11px;opacity:.55;margin-top:3px}
+.score-ring{text-align:center;flex-shrink:0}
+.score-ring .s-num{font-size:24px;font-weight:700;line-height:1}
+.score-ring .s-lbl{font-size:10px;opacity:.55;margin-top:2px}
+.cat-tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:1rem;align-items:center}
+.cat-tab{padding:5px 12px;border-radius:20px;border:1.5px solid var(--mist);background:var(--card);font-size:12px;font-family:'Noto Sans JP',sans-serif;cursor:pointer;color:var(--sub);transition:all .15s;white-space:nowrap}
+.cat-tab.active{background:var(--ocean);border-color:var(--ocean);color:#fff;font-weight:500}
+.q-count{font-size:12px;color:var(--sub);margin-left:auto}
+.pbar-wrap{margin-bottom:1.25rem}
+.pbar{height:6px;background:var(--mist);border-radius:3px;overflow:hidden}
+.pbar-fill{height:100%;background:var(--ok);border-radius:3px;transition:width .4s ease}
+.pbar-lbl{font-size:11px;color:var(--sub);margin-top:4px;text-align:right}
+.q-card{background:var(--card);border:0.5px solid var(--border);border-radius:10px;padding:1rem 1.25rem;margin-bottom:.75rem}
+.q-card.answered{border-color:var(--ok);opacity:.85}
+.q-badge{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;margin-bottom:8px}
+.qb-calendar{background:#EBF4F8;color:#0C447C}
+.qb-role{background:#EAF3DE;color:#3B6D11}
+.qb-inspect{background:#FAEEDA;color:#854F0B}
+.qb-risk{background:#FCEBEB;color:#A32D2D}
+.qb-uncollected{background:#F4E6FB;color:#53348B}
+.qb-system{background:#E8F5E9;color:#2E7D32}
+.qb-recruit{background:#E3F2FD;color:#1565C0}
+.q-text{font-size:15px;font-weight:500;line-height:1.6;margin-bottom:.75rem;color:var(--text)}
+.choices{display:flex;flex-direction:column;gap:6px}
+.choice{display:flex;align-items:flex-start;gap:10px;padding:8px 12px;border-radius:8px;border:0.5px solid var(--border);cursor:pointer;transition:all .15s;font-size:14px;line-height:1.5;color:var(--text)}
+.choice:hover{border-color:var(--ocean);background:#f0f9fb}
+.choice.correct{background:#E1F5EE;border-color:var(--ok);color:#085041;pointer-events:none}
+.choice.wrong{background:#FCEBEB;border-color:#A32D2D;color:#A32D2D;pointer-events:none}
+.choice.disabled{pointer-events:none;opacity:.5}
+.choice.selected{background:#EBF4F8;border-color:var(--ocean)}
+.choice-icon{flex-shrink:0;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;margin-top:1px}
+.exp{margin-top:.75rem;padding:.75rem;background:#f8f9fa;border-radius:8px;font-size:13px;color:var(--sub);line-height:1.7;display:none}
+.exp.show{display:block}
+.submit-btn{margin-top:10px;padding:7px 20px;background:var(--ink);color:#fff;border:none;border-radius:7px;font-family:'Noto Sans JP',sans-serif;font-size:13px;cursor:pointer}
+.result-panel{background:var(--card);border:0.5px solid var(--border);border-radius:12px;padding:1.5rem;text-align:center;display:none;margin-top:.5rem}
+.result-panel.show{display:block}
+.r-score{font-size:48px;font-weight:700;color:var(--ink)}
+.r-grade{font-size:18px;font-weight:500;margin:.5rem 0}
+.r-msg{font-size:13px;color:var(--sub);line-height:1.7;margin-bottom:1rem}
+.r-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem}
+.r-item{background:#f8f9fa;border-radius:8px;padding:.75rem;text-align:center}
+.r-item .rn{font-size:20px;font-weight:700}
+.r-item .rl{font-size:11px;color:var(--sub);margin-top:2px}
+.retry-btn{padding:10px 28px;background:var(--ink);color:#fff;border:none;border-radius:8px;font-family:'Noto Sans JP',sans-serif;font-size:14px;font-weight:500;cursor:pointer}
+
+/* ══ 引継ぎページ ══ */
+.onboard-wrap{max-width:800px;margin:0 auto;padding:1.5rem}
+.prog-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.5rem}
+.prog-top{display:flex;justify-content:space-between;margin-bottom:.75rem;font-size:14px;font-weight:500}
+.ob-pbar{height:10px;background:var(--mist);border-radius:5px;overflow:hidden;margin-bottom:.75rem}
+.ob-pbar-fill{height:100%;background:var(--ok);border-radius:5px;transition:width .4s ease}
+.phase-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem}
+.phase-item{background:var(--bg);border-radius:7px;padding:.6rem;text-align:center}
+.phase-item .pn{font-size:18px;font-weight:700}
+.phase-item .pl{font-size:11px;color:var(--sub)}
+.cl-group{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:1rem}
+.cl-head{background:var(--ink);color:#fff;padding:.7rem 1.25rem;font-size:13px;font-weight:700;display:flex;justify-content:space-between}
+.cl-head .cl-prog{font-size:12px;opacity:.6}
+.cl-item{display:flex;align-items:flex-start;gap:.75rem;padding:.8rem 1.25rem;border-bottom:1px solid #f0f0f0;cursor:pointer;transition:background .1s}
+.cl-item:last-child{border-bottom:none}
+.cl-item:hover{background:#fafafa}
+.cl-item.done{opacity:.6}
+.cl-item.done .cl-text{text-decoration:line-through;color:var(--sub)}
+.cl-check{width:22px;height:22px;border:2px solid var(--ocean);border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--ok);margin-top:1px}
+.cl-item.done .cl-check{background:var(--ok);border-color:var(--ok);color:#fff}
+.cl-text{font-size:13px;flex:1}
+.cl-tag{font-size:11px;padding:1px 7px;border-radius:10px;flex-shrink:0;margin-top:2px;white-space:nowrap}
+.t-urgent{background:#FCEBEB;color:#A32D2D}
+.t-first{background:#EBF4F8;color:#0C447C}
+.t-week{background:#EAF3DE;color:#3B6D11}
+.t-month{background:#FAEEDA;color:#854F0B}
+.warn-list{list-style:none}
+.warn-list li{padding:.55rem .875rem;border-radius:7px;margin-bottom:.4rem;font-size:13px;display:flex;gap:.5rem;align-items:flex-start}
+.warn-list li.wl-r{background:#fff5f5;color:#7a1a1a}
+.warn-list li.wl-y{background:#fffbf5;color:#5c3a00}
+.warn-list li.wl-b{background:#EBF4F8;color:#0C447C}
+.ob-reset{padding:8px 20px;background:var(--mist);color:var(--ink);border:none;border-radius:7px;font-family:'Noto Sans JP',sans-serif;font-size:13px;cursor:pointer;margin-top:1rem}
+.ob-sec-title{font-size:17px;font-weight:700;color:var(--ink);padding-bottom:.5rem;border-bottom:2px solid var(--ocean);margin:2rem 0 1rem}
+.ob-sub{font-size:14px;font-weight:700;margin:1.1rem 0 .7rem;padding-left:.7rem;border-left:3px solid var(--ocean)}
+
+/* ══ モバイル対応 ══ */
+@media(max-width:768px){
+  .manual-sidebar{display:none}
+  .manual-main{padding:1rem}
+  .test-wrap,.onboard-wrap{padding:1rem}
+  .page-hero{padding:1.25rem}
+  .topnav-brand span{display:none}
+  .topnav-tab{padding:.875rem 1rem;font-size:12px}
+}
+</style>
+</head>
+<body>
+
+<!-- トップナビ -->
+<nav class="topnav">
+  <div class="topnav-brand">かえりえ上北沢 <span>管理者ポータル</span></div>
+  <div class="topnav-tabs">
+    <div class="topnav-tab active" onclick="switchPage('manual')" id="tab-manual"><span class="tab-icon">📖</span>マニュアル</div>
+    <div class="topnav-tab" onclick="switchPage('test')" id="tab-test"><span class="tab-icon">✅</span>業務テスト</div>
+    <div class="topnav-tab" onclick="switchPage('onboard')" id="tab-onboard"><span class="tab-icon">🗂️</span>新任管理者パック</div>
+  </div>
+</nav>
+
+<!-- ══════════════════ マニュアルページ ══════════════════ -->
+<div class="page active" id="page-manual">
+<div class="manual-layout">
+  <nav class="manual-sidebar">
+    <div class="nav-section">逆引き</div>
+    <a class="nav-link" href="#index" onclick="scrollTo('index')">やりたいことから探す</a>
+    <div class="nav-section">月次業務</div>
+    <a class="nav-link" href="#calendar" onclick="scrollTo('calendar')">月次カレンダー</a>
+    <a class="nav-link" href="#inspect" onclick="scrollTo('inspect')">インスペMT</a>
+    <div class="nav-section">運営・管理</div>
+    <a class="nav-link" href="#newcase" onclick="scrollTo('newcase')">新規受け入れ判断</a>
+    <a class="nav-link" href="#sales" onclick="scrollTo('sales')">営業・紹介元対応</a>
+    <a class="nav-link" href="#claim" onclick="scrollTo('claim')">クレーム対応</a>
+    <a class="nav-link" href="#staff" onclick="scrollTo('staff')">職員管理</a>
+    <div class="nav-section">財務・請求</div>
+    <a class="nav-link" href="#uncollected" onclick="scrollTo('uncollected')">未収金管理</a>
+    <a class="nav-link" href="#returns" onclick="scrollTo('returns')">返戻対応</a>
+    <a class="nav-link" href="#addition" onclick="scrollTo('addition')">加算管理</a>
+    <div class="nav-section">システム</div>
+    <a class="nav-link" href="#systems" onclick="scrollTo('systems')">システム一覧・リンク</a>
+    <a class="nav-link" href="#recruit" onclick="scrollTo('recruit')">採用管理（HITOマネ）</a>
+    <div class="nav-section">会議・報告</div>
+    <a class="nav-link" href="#meetings" onclick="scrollTo('meetings')">会議体一覧</a>
+    <a class="nav-link" href="#incident" onclick="scrollTo('incident')">インシデントレポート</a>
+  </nav>
+
+  <main class="manual-main" id="manual-main">
+    <div class="page-hero"><h2>かえりえ上北沢　支配人業務マニュアル</h2><p>看護小規模多機能型居宅介護 ／ やさしい手株式会社 ／ 2026年6月版 ／ iPad・PC対応</p></div>
+
+    <section class="sec" id="index">
+      <h2 class="sec-title">やりたいことから探す（逆引きインデックス）</h2>
+      <div class="index-grid">
+        <a class="idx" href="#calendar" onclick="scrollTo('calendar')"><div class="i-tag">月次業務</div><div class="i-lbl">今月の締め作業を確認したい</div></a>
+        <a class="idx" href="#inspect" onclick="scrollTo('inspect')"><div class="i-tag">インスペMT</div><div class="i-lbl">インスペの準備・入力をしたい</div></a>
+        <a class="idx" href="#newcase" onclick="scrollTo('newcase')"><div class="i-tag">新規受け入れ</div><div class="i-lbl">受け入れを判断したい</div></a>
+        <a class="idx" href="#sales" onclick="scrollTo('sales')"><div class="i-tag">営業</div><div class="i-lbl">営業先・紹介元を確認したい</div></a>
+        <a class="idx" href="#uncollected" onclick="scrollTo('uncollected')"><div class="i-tag">未収金</div><div class="i-lbl">未収金を確認・入力したい</div></a>
+        <a class="idx" href="#returns" onclick="scrollTo('returns')"><div class="i-tag">返戻</div><div class="i-lbl">返戻通知が届いたので対応したい</div></a>
+        <a class="idx" href="#addition" onclick="scrollTo('addition')"><div class="i-tag">加算</div><div class="i-lbl">看護体制強化加算の要件を確認したい</div></a>
+        <a class="idx" href="#claim" onclick="scrollTo('claim')"><div class="i-tag">クレーム</div><div class="i-lbl">クレームが発生した</div></a>
+        <a class="idx" href="#staff" onclick="scrollTo('staff')"><div class="i-tag">職員管理</div><div class="i-lbl">勤怠・面談・退職予防の対応をしたい</div></a>
+        <a class="idx" href="#systems" onclick="scrollTo('systems')"><div class="i-tag">システム</div><div class="i-lbl">使うシステムのリンクを開きたい</div></a>
+        <a class="idx" href="#recruit" onclick="scrollTo('recruit')"><div class="i-tag">採用</div><div class="i-lbl">HITOマネで応募を確認したい</div></a>
+        <a class="idx" href="#meetings" onclick="scrollTo('meetings')"><div class="i-tag">会議</div><div class="i-lbl">会議体・スケジュールを確認したい</div></a>
+        <a class="idx" href="#incident" onclick="scrollTo('incident')"><div class="i-tag">インシデント</div><div class="i-lbl">会議後に議事録を発信したい</div></a>
+      </div>
+    </section>
+
+    <section class="sec" id="calendar">
+      <h2 class="sec-title">月次カレンダー（営業日ベース）</h2>
+      <div class="card card-warn">⚠️ 日付は営業日ベースです。土日祝を除いてカウントしてください。</div>
+      <table>
+        <tr><th>タイミング</th><th>業務内容</th></tr>
+        <tr><td><span class="badge b-blue">第1営業日</span></td><td>勤怠締め（15時締切）、夜勤手当・エリア手当入力（正社員のみ）</td></tr>
+        <tr><td><span class="badge b-blue">第2営業日</span></td><td>勤怠締め最終確認、E2入力</td></tr>
+        <tr><td><span class="badge b-blue">第3営業日</span></td><td>E2入力、賃金締め確認</td></tr>
+        <tr><td><span class="badge b-orange">インスペ前日</span></td><td>見込み値入力（売上・労務費・経費・利用者の流入流出）、ゴリラKPI入力、レセプトチェック</td></tr>
+        <tr><td><span class="badge b-red">7日（インスペ）</span></td><td>10時までに見込み値入力、13時インスペMT、17時見込み差異確認</td></tr>
+        <tr><td><span class="badge b-blue">第7〜9営業日</span></td><td>返戻通知確認・対応、E2入力</td></tr>
+        <tr><td><span class="badge b-orange">第10営業日</span></td><td>仮締め・仮締め数値確認</td></tr>
+        <tr><td><span class="badge b-orange">第11営業日</span></td><td>本締め、MBO数字確認・課員展開</td></tr>
+        <tr><td><span class="badge b-red">17日（インスペ）</span></td><td>10時までに見込み値入力、13時インスペMT、17時見込み差異確認、未収金確認</td></tr>
+        <tr><td><span class="badge b-blue">19日前後</span></td><td>ガルーンメールで未収金通知 → QuickSightで確認開始</td></tr>
+        <tr><td><span class="badge b-red">27日（インスペ）</span></td><td>10時までに見込み値入力、13時インスペMT、17時見込み差異確認、未収金スプレッドシート入力期限</td></tr>
+        <tr><td><span class="badge b-blue">28日前後</span></td><td>ガルーンメール【202〇年〇月審査返戻通知】 → リーフNASで確認・対応</td></tr>
+      </table>
+      <table>
+        <tr><th>頻度</th><th>業務</th></tr>
+        <tr><td>2ヵ月に1回</td><td>運営推進会議（包括・利用者家族・地域住民）</td></tr>
+        <tr><td>3ヵ月に1回</td><td>生産性向上加算要件確認会議</td></tr>
+        <tr><td>年1回（3月）</td><td>生産性向上加算の行政報告</td></tr>
+      </table>
+    </section>
+
+    <section class="sec" id="inspect">
+      <h2 class="sec-title">インスペクションミーティング（7・17・27日）</h2>
+      <div class="flow">
+        <div class="flow-step"><div class="flow-num">1</div><div><strong>10時まで</strong>：見込み値入力（売上・労務費・経費・利用者の流入流出）</div></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step"><div class="flow-num">2</div><div><strong>13時〜</strong>：インスペクションMT（本社・RSC・エリア長・ケアマネ・看護管理者・支配人）</div></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step"><div class="flow-num">3</div><div><strong>17時</strong>：見込み差異報告スプレッドシートの確認</div></div>
+      </div>
+      <h3 class="sub-title">経費確認の2つの方法</h3>
+      <div class="card"><p><strong>方法①</strong>：E2（ProActive E2）からPLを出力して確認</p><p style="margin-top:.5rem"><strong>方法②</strong>：ガルーン → ファイル管理 → やさしい手 → 予見差異分析会議 → E2管理会計データ（4階層・5階層の本締めデータ）を参照</p></div>
+      <h3 class="sub-title">確認項目</h3>
+      <table>
+        <tr><th>カテゴリ</th><th>確認内容</th></tr>
+        <tr><td>売上</td><td>介護保険料・自費（食費・宿泊費）・加算</td></tr>
+        <tr><td>看護体制強化加算</td><td>特別管理加算・緊急対応加算・指示書発行率（毎月確認）</td></tr>
+        <tr><td>生産性向上加算Ⅱ</td><td>3ヵ月に1回の会議実施・年1回の行政報告（3月）</td></tr>
+        <tr><td>損益</td><td>労務費・経費（E2 PL またはガルーン管理会計データ）</td></tr>
+        <tr><td>稼働・案件</td><td>登録者数・流入・流出・案件数・各職員営業件数</td></tr>
+        <tr><td>未収金</td><td>未収金の状況・対応状況</td></tr>
+      </table>
+    </section>
+
+    <section class="sec" id="newcase">
+      <h2 class="sec-title">新規相談の受け入れ判断</h2>
+      <h3 class="sub-title">初回電話時の確認事項</h3>
+      <table>
+        <tr><th>確認項目</th><th>理由・注意点</th></tr>
+        <tr><td>介護度</td><td>要支援は利用不可。要介護認定が必要</td></tr>
+        <tr><td>居住地（区）</td><td>地域密着型のため世田谷区内かどうか確認必須</td></tr>
+        <tr><td>主疾患・医療行為の有無</td><td>看護ニーズの確認、夜間医療行為の有無を把握</td></tr>
+        <tr><td>かんたきを検討している理由</td><td>ニーズの整合性確認・受け入れ方針判断の材料</td></tr>
+      </table>
+      <h3 class="sub-title">受け入れ判断基準</h3>
+      <table>
+        <tr><th>判断区分</th><th>基準・具体例</th></tr>
+        <tr><td><span class="badge b-teal">積極受け入れ</span></td><td>本人・家族ともに在宅継続の希望あり。医療行為あり・看護の目が必要なケース</td></tr>
+        <tr><td><span class="badge b-orange">慎重に判断</span></td><td>家族のメンタル面が不安定・意向が頻繁に変わる。契約後トラブルリスクが高い</td></tr>
+        <tr><td><span class="badge b-blue">基本断らない</span></td><td>まず受け入れ、在宅継続の可否を一緒に判断する。施設移行の相談も対応可</td></tr>
+        <tr><td><span class="badge b-red">受け入れ不可</span></td><td>夜間（18時〜翌9時）に頻回な医療行為が必要なケース（看護師対応不可）</td></tr>
+      </table>
+      <h3 class="sub-title">吸引ケースの判断手順</h3>
+      <div class="flow">
+        <div class="flow-step"><div class="flow-num">1</div><div>病院での夜間吸引頻度を確認（何回か）</div></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step"><div class="flow-num">2</div><div>「実際に引けているか」を確認（ラウンドで形式的に吸引しているだけで引けていないケースあり）</div></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step"><div class="flow-num">3</div><div>判断に迷う場合は看護師と共に病院へ面会に行き、直接状態を確認</div></div>
+      </div>
+      <div class="card card-warn" style="margin-top:.875rem">⚠️ <strong>ショートステイ方針</strong>：ショートのみの相談は基本受け入れない。ベッドが埋まると登録利用者の緊急宿泊・新規受け入れができなくなるため。登録につながりそうなケースのみ例外的に対応。</div>
+    </section>
+
+    <section class="sec" id="sales">
+      <h2 class="sec-title">営業・紹介元対応</h2>
+      <table>
+        <tr><th>紹介元</th><th>担当者</th><th>状況・課題</th></tr>
+        <tr><td>至誠会第二病院</td><td>小島SW（ほぼ100%）</td><td>安定しているが小島氏一人に依存。他SWへのアプローチも必要</td></tr>
+        <tr><td>世田谷北部病院</td><td>中村SW・熊谷SW＋新任2名</td><td>新任SW2名へのアプローチが不足→案件鈍化中。早急な関係構築が必要</td></tr>
+        <tr><td>居宅・包括（近隣）</td><td>上北沢・八幡山・桜上水・北烏山・南烏山エリア</td><td>安定。定期訪問で空き状況・機能説明を継続</td></tr>
+      </table>
+      <ul class="checklist">
+        <li>病院：最低月2回は訪問・挨拶・空き情報を伝える。他院ケースのフィードバックを行う</li>
+        <li>居宅・包括：定期的な訪問で顔を覚えてもらう。かんたき機能の説明を丁寧に行う</li>
+        <li>遠方からの相談：担当ケアマネのエリアを確認し、遠方の場合は他事業所を案内</li>
+        <li>新規開拓：急性期・回復期病院との親和性が高い。未アプローチの病院を開拓する</li>
+      </ul>
+    </section>
+
+    <section class="sec" id="claim">
+      <h2 class="sec-title">クレーム対応</h2>
+      <div class="card card-danger">⚠️ クレームになった時点でエリア長に即報告すること。</div>
+      <div class="flow" style="margin-top:.875rem">
+        <div class="flow-step"><div class="flow-num">1</div><div>拠点内で対応する職種（介護・看護・ケアマネ・支配人）を確認</div></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step"><div class="flow-num">2</div><div><strong>エリア長に即報告</strong></div></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step"><div class="flow-num">3</div><div>経緯・対応内容・再発防止策を記録に残す</div></div>
+      </div>
+      <div class="card card-warn" style="margin-top:.875rem">⚠️ 状態変化の共有タイミング：日中発見→その日のうちに家族報告。夜間帯発見→翌朝に家族報告。まとめてモニタリング時に報告するのはNG。</div>
+    </section>
+
+    <section class="sec" id="staff">
+      <h2 class="sec-title">職員管理</h2>
+      <table>
+        <tr><th>担当者</th><th>管理対象</th></tr>
+        <tr><td>支配人</td><td>ケアマネ・看護管理者・介護主任・介護正社員の勤怠</td></tr>
+        <tr><td>看護管理者</td><td>看護師全般の勤怠</td></tr>
+        <tr><td>介護主任</td><td>非常勤介護士の勤怠（現状）</td></tr>
+      </table>
+      <ul class="checklist">
+        <li>管理者が「いつでも話を聞いてもらえる」と思ってもらえる関係づくりが最重要</li>
+        <li>介護士は自発的に相談しない傾向がある。意識的に声をかけ面談を設定する</li>
+        <li>看護師には専門性があるため「一緒に考える」姿勢を持つ。知識で対抗しない</li>
+        <li>全職種（非常勤含む）と定期的な面談を実施する</li>
+      </ul>
+    </section>
+
+    <section class="sec" id="uncollected">
+      <h2 class="sec-title">未収金管理</h2>
+      <div class="flow">
+        <div class="flow-step"><div class="flow-num">1</div><div><strong>19日前後</strong>：ガルーンメールで未収金通知届く</div></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step"><div class="flow-num">2</div><div>QuickSightにログインして未収金を確認</div></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step"><div class="flow-num">3</div><div><strong>27日前後まで</strong>：未収金入力用スプレッドシートに入力</div></div>
+      </div>
+      <div class="link-btns">
+        <a class="link-btn" href="https://ap-northeast-1.quicksight.aws.amazon.com/sn/account/yst-quicksight/start/home" target="_blank">QuickSight（未収金確認）</a>
+        <a class="link-btn" href="https://docs.google.com/spreadsheets/d/19hfkNlSf7KZDSdV3bnIJBb5dJSGxzwf_u0TRRJvJC0w/edit?gid=485409748" target="_blank">未収金入力スプレッドシート</a>
+        <a class="link-btn" href="https://docs.google.com/presentation/d/1zJu6DGGXnRmx4i3aPB_mhg9HfFILiOBOrRxigGMrWrI/edit?usp=sharing" target="_blank">QuickSight運用マニュアル</a>
+        <a class="link-btn" href="https://forms.gle/zhFBN8GnAdcys1rWA" target="_blank">営業経理G問い合わせフォーム</a>
+        <a class="link-btn" href="https://docs.google.com/spreadsheets/d/1J5QuJAZanPPsmChT73H7KlokW0Uq6NRJtflWjFQ43vg/edit?usp=sharing" target="_blank">未収金FAQ</a>
+      </div>
+      <h3 class="sub-title">未収金が発生しやすいパターンと対処法</h3>
+      <table>
+        <tr><th>パターン</th><th>対処法</th></tr>
+        <tr><td>区分変更申請中（2〜4ヶ月）</td><td>エリア長・本部に報告。随時報告を継続</td></tr>
+        <tr><td>月途中移行時の加算重複（緊急時訪問看護加算など）</td><td>移行月は加算の重複がないか必ず確認</td></tr>
+        <tr><td>月末の新規受け入れによる居宅届出遅れ</td><td>月末の新規相談は届出スケジュールを事前確認</td></tr>
+        <tr><td>口座引き落とし（印鑑）の戻り</td><td>戻りが判明したらすぐ家族へ連絡し即時入金を依頼</td></tr>
+      </table>
+    </section>
+
+    <section class="sec" id="returns">
+      <h2 class="sec-title">返戻対応</h2>
+      <div class="flow">
+        <div class="flow-step"><div class="flow-num">1</div><div><strong>28日前後</strong>：ガルーンメールで【202〇年〇月審査返戻通知】が届く</div></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step"><div class="flow-num">2</div><div>リーフNASシステムにログインして返戻通知書を確認</div></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step"><div class="flow-num">3</div><div>原因を特定して対応・再請求</div></div>
+      </div>
+      <div class="card"><strong>リーフNAS格納先（看護・SS）</strong><br><code style="font-size:12px">104_看護入浴SS → 01_【看護・SS】返戻・支払決定通知フォルダ → XXXX審査</code></div>
+      <div class="link-btns"><a class="link-btn" href="https://yst-doc.com/" target="_blank">リーフNASシステム</a></div>
+    </section>
+
+    <section class="sec" id="addition">
+      <h2 class="sec-title">加算管理</h2>
+      <div class="card card-warn">⚠️ KANTAK-WIZには加算情報が入っていません。加算管理は専用の「加算管理ダッシュボード」で確認してください。</div>
+      <table>
+        <tr><th>指標</th><th>確認方法・注意点</th></tr>
+        <tr><td>特別管理加算</td><td>加算管理ダッシュボードで算定状況を確認（毎月）</td></tr>
+        <tr><td>緊急対応加算</td><td>加算管理ダッシュボードで算定状況を確認（毎月）</td></tr>
+        <tr><td>指示書発行率（30%以上）</td><td>加算管理ダッシュボードで発行率を確認（毎月）</td></tr>
+        <tr><td>生産性向上加算Ⅱ</td><td>3ヵ月に1回の社内会議実施・年1回（3月）行政報告</td></tr>
+      </table>
+      <div class="link-btns">
+        <a class="link-btn" href="https://yst-nakamura.github.io/-/" target="_blank">加算管理ダッシュボード（ログインID：yst0001）</a>
+      </div>
+    </section>
+
+    <section class="sec" id="systems">
+      <h2 class="sec-title">システム一覧・リンク集</h2>
+      <table>
+        <tr><th>システム名</th><th>用途</th><th>アクセス方法</th></tr>
+        <tr><td>E2（ProActive E2）</td><td>売上損益・PL出力・見込み値入力</td><td>ガルーンのリンク集「ProActive E2（PA E2）」から開く</td></tr>
+        <tr><td>KANTAK-WIZ</td><td>利用者記録・かるがも日々締め</td><td>—</td></tr>
+        <tr><td>加算管理ダッシュボード</td><td>看護体制強化加算の3指標確認（特別管理・緊急対応・指示書発行率）</td><td>下記リンク（ID：yst0001）</td></tr>
+        <tr><td>QuickSight</td><td>未収金確認</td><td>下記リンク</td></tr>
+        <tr><td>リーフNASシステム</td><td>返戻通知書の確認・書類管理</td><td>下記リンク</td></tr>
+        <tr><td>zooシステム（SSO）</td><td>BCP・インシデントレポート・オーシャン等へのSSOログイン</td><td>下記リンク</td></tr>
+        <tr><td>インシデントレポート</td><td>会議議事録発信・インシデント報告</td><td>下記リンク</td></tr>
+        <tr><td>HITOマネ</td><td>採用管理（非常勤の応募確認・面接調整）</td><td>下記リンク</td></tr>
+      </table>
+      <h3 class="sub-title">よく使うリンク</h3>
+      <div class="link-btns">
+        <a class="link-btn" href="https://ap-northeast-1.quicksight.aws.amazon.com/sn/account/yst-quicksight/start/home" target="_blank">QuickSight</a>
+        <a class="link-btn" href="https://yst-nakamura.github.io/-/" target="_blank">加算管理ダッシュボード（ID：yst0001）</a>
+        <a class="link-btn" href="https://yst-doc.com/" target="_blank">リーフNASシステム</a>
+        <a class="link-btn" href="https://yst-sso.com/" target="_blank">zooシステム（SSO）</a>
+        <a class="link-btn" href="https://yst-incident.com/top" target="_blank">インシデントレポート</a>
+        <a class="link-btn" href="https://kanri.hitomgr.jp/4hdx/login" target="_blank">HITOマネ</a>
+        <a class="link-btn" href="http://192.168.248.100/scripts/cbgrn/grn.exe/cabinet/index?hid=21825" target="_blank">ガルーン：予見差異分析会議</a>
+        <a class="link-btn" href="http://192.168.248.100/scripts/cbgrn/grn.exe/cabinet/index?hid=24783" target="_blank">ガルーン：E2管理会計データ</a>
+        <a class="link-btn" href="https://docs.google.com/spreadsheets/d/19hfkNlSf7KZDSdV3bnIJBb5dJSGxzwf_u0TRRJvJC0w/edit?gid=485409748" target="_blank">未収金入力スプレッドシート</a>
+        <a class="link-btn" href="https://docs.google.com/spreadsheets/d/1kgHvUHVK_s6UpILWPcSycDWM_JV0QWHMelnwu-m797Q/edit?gid=1658006178" target="_blank">三指針BCP会議チェックシート</a>
+        <a class="link-btn" href="https://docs.google.com/presentation/d/1vxp4Cleu15lUxUHV59_1Fhy5FX6AIO68/edit#slide=id.p1" target="_blank">三指針マニュアル</a>
+      </div>
+    </section>
+
+    <section class="sec" id="recruit">
+      <h2 class="sec-title">採用管理（HITOマネ）</h2>
+      <div class="card card-warn">⚠️ HITOマネは毎日チェックすること。応募があれば即時対応して面接アポを取る。</div>
+      <table>
+        <tr><th>採用区分</th><th>担当</th></tr>
+        <tr><td>正社員</td><td>人事課・エリア長</td></tr>
+        <tr><td>非常勤</td><td>支配人</td></tr>
+      </table>
+      <div class="flow" style="margin-top:.875rem">
+        <div class="flow-step"><div class="flow-num">1</div><div>HITOマネで応募を確認（毎日チェック）</div></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step"><div class="flow-num">2</div><div>即時連絡・面接アポを取る</div></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step"><div class="flow-num">3</div><div>自拠点が充足している場合は近隣事業所の空きを確認して提案</div></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step"><div class="flow-num">4</div><div>選考進捗に合わせてステータスを随時更新。求人原稿の掲載状況も定期確認（終了・非掲載になっていたら修正）</div></div>
+      </div>
+      <div class="link-btns"><a class="link-btn" href="https://kanri.hitomgr.jp/4hdx/login" target="_blank">HITOマネにログイン</a></div>
+    </section>
+
+    <section class="sec" id="meetings">
+      <h2 class="sec-title">会議体一覧</h2>
+      <table>
+        <tr><th>会議名</th><th>開催頻度</th><th>主な議題</th></tr>
+        <tr><td>インスペクションMT</td><td>毎月7・17・27日 11〜12時</td><td>売上損益・登録者数・案件数・加算・未収金</td></tr>
+        <tr><td>運営推進会議</td><td>2ヵ月に1回</td><td>事業所の運営状況報告</td></tr>
+        <tr><td>三指針会議（各種）</td><td>年間スケジュール参照</td><td>身体拘束・感染・BCP・ハラスメントなど</td></tr>
+        <tr><td>生産性向上加算会議</td><td>3ヵ月に1回</td><td>加算要件の確認</td></tr>
+      </table>
+      <div class="link-btns"><a class="link-btn" href="https://docs.google.com/spreadsheets/d/1kgHvUHVK_s6UpILWPcSycDWM_JV0QWHMelnwu-m797Q/edit?gid=1658006178" target="_blank">年間スケジュール</a></div>
+    </section>
+
+    <section class="sec" id="incident">
+      <h2 class="sec-title">インシデントレポートの使い方</h2>
+      <div class="card card-ok">会議を行った後は、インシデントレポートで議事録を発信する。</div>
+      <div class="flow" style="margin-top:.875rem">
+        <div class="flow-step"><div class="flow-num">1</div><div>インシデントレポート（yst-incident.com）にログイン</div></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step"><div class="flow-num">2</div><div>「インシデントレポート作成」を選択</div></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step"><div class="flow-num">3</div><div>「申請区分」で該当する会議の区分を選択して申請</div></div>
+      </div>
+      <div class="link-btns">
+        <a class="link-btn" href="https://yst-sso.com/" target="_blank">zooシステム（SSOログイン）</a>
+        <a class="link-btn" href="https://yst-incident.com/top" target="_blank">インシデントレポート（直接）</a>
+      </div>
+    </section>
+  </main>
+</div>
+</div>
+
+<!-- ══════════════════ テストページ ══════════════════ -->
+<div class="page" id="page-test">
+<div class="test-wrap">
+  <div class="test-header">
+    <div><div class="t-title">業務理解度テスト</div><div class="t-sub">三指針研修を除く全34問 ／ 支配人（課長）教育訓練用</div></div>
+    <div class="score-ring"><div class="s-num" id="t-score">0/0</div><div class="s-lbl">正解数</div></div>
+  </div>
+  <div class="cat-tabs">
+    <button class="cat-tab active" onclick="filterCat('all')">すべて</button>
+    <button class="cat-tab" onclick="filterCat('calendar')">月次業務</button>
+    <button class="cat-tab" onclick="filterCat('role')">役割分担</button>
+    <button class="cat-tab" onclick="filterCat('inspect')">インスペ・加算</button>
+    <button class="cat-tab" onclick="filterCat('risk')">リスク・判断</button>
+    <button class="cat-tab" onclick="filterCat('uncollected')">未収金・返戻</button>
+    <button class="cat-tab" onclick="filterCat('system')">システム・会議</button>
+    <button class="cat-tab" onclick="filterCat('recruit')">採用管理</button>
+    <span class="q-count" id="q-count">34問</span>
+  </div>
+  <div class="pbar-wrap">
+    <div class="pbar"><div class="pbar-fill" id="t-pbar" style="width:0%"></div></div>
+    <div class="pbar-lbl" id="t-pbar-lbl">0 / 34問 回答済み</div>
+  </div>
+  <div id="q-container"></div>
+  <div class="result-panel" id="result-panel">
+    <div class="r-score" id="r-score">--</div>
+    <div class="r-grade" id="r-grade"></div>
+    <div class="r-msg" id="r-msg"></div>
+    <div class="r-grid">
+      <div class="r-item"><div class="rn" id="r-correct">-</div><div class="rl">正解数</div></div>
+      <div class="r-item"><div class="rn" id="r-pct">-</div><div class="rl">正答率</div></div>
+    </div>
+    <button class="retry-btn" onclick="resetTest()">もう一度挑戦する</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════ 新任管理者パックページ ══════════════════ -->
+<div class="page" id="page-onboard">
+<div class="onboard-wrap">
+  <div class="page-hero"><h2>新任管理者パック</h2><p>引継ぎチェックリスト ／ 着任後確認シート ／ 注意事項まとめ</p></div>
+
+  <div class="prog-card">
+    <div class="prog-top"><span>全体の進捗</span><span id="ob-prog-txt">0 / 0 完了</span></div>
+    <div class="ob-pbar"><div class="ob-pbar-fill" id="ob-pbar" style="width:0%"></div></div>
+    <div class="phase-grid">
+      <div class="phase-item"><div class="pn" id="p-urgent">0/0</div><div class="pl">即時対応</div></div>
+      <div class="phase-item"><div class="pn" id="p-first">0/0</div><div class="pl">1週間以内</div></div>
+      <div class="phase-item"><div class="pn" id="p-month">0/0</div><div class="pl">1ヶ月以内</div></div>
+    </div>
+  </div>
+
+  <h2 class="ob-sec-title">引継ぎチェックリスト（引継ぎ期間中）</h2>
+  <div class="cl-group" id="grp-hikisugi">
+    <div class="cl-head"><span>現管理者からの引継ぎ事項</span><span class="cl-prog" id="prog-hikisugi"></span></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">年間スケジュール（Googleスプレッドシート）を確認・カレンダーに登録する</div><span class="cl-tag t-urgent">即時</span></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">インスペクションMTの日程を確認する（毎月7・17・27日）</div><span class="cl-tag t-urgent">即時</span></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">各システムのID・パスワードを引継ぎ担当から受け取る（E2・KANTAK-WIZ・ガルーン・zoo・HITOマネ等）</div><span class="cl-tag t-urgent">即時</span></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">現在の登録者数・案件数・流入流出の見込みを確認する</div><span class="cl-tag t-urgent">即時</span></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">現在の未収金の状況を確認する（QuickSight）</div><span class="cl-tag t-urgent">即時</span></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">看護師の採用状況を確認する（現在3名体制・追加採用急務）</div><span class="cl-tag t-urgent">即時</span></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">HITOマネの求人原稿ステータスを確認する（掲載中か・開始日・終了日）</div><span class="cl-tag t-urgent">即時</span></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">ケアマネの直近書類状況を確認する（モニタリング・ケアプラン更新）</div><span class="cl-tag t-first">1週間以内</span></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">エリア長・本部への確認事項（加算詳細・シフト管理システム移管・人事方針等）を確認する</div><span class="cl-tag t-first">1週間以内</span></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">至誠会第二病院（小島SW）・世田谷北部病院（新任SW2名）への挨拶・訪問を行う</div><span class="cl-tag t-first">1週間以内</span></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">全職種（非常勤含む）との初回面談を設定・実施する</div><span class="cl-tag t-week">2週間以内</span></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">送迎ルート・フロア業務・訪問介護の業務の流れを把握する</div><span class="cl-tag t-week">2週間以内</span></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">現在進行中の案件（高角度・低角度・見学予定）を把握する</div><span class="cl-tag t-week">2週間以内</span></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">加算の種類と現在の算定状況を確認する</div><span class="cl-tag t-month">1ヶ月以内</span></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">帳票・指示書の管理ルールを確認する</div><span class="cl-tag t-month">1ヶ月以内</span></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">夜間・緊急時の対応体制（連絡先・何時まで対応可能か）を確認する</div><span class="cl-tag t-month">1ヶ月以内</span></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">直近の実地指導の実施時期と指摘事項を確認する</div><span class="cl-tag t-month">1ヶ月以内</span></div>
+  </div>
+
+  <h2 class="ob-sec-title">着任後の定期確認チェックリスト</h2>
+  <div class="cl-group" id="grp-daily">
+    <div class="cl-head"><span>日次チェック</span><span class="cl-prog" id="prog-daily"></span></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">利用者の状態変化確認（送迎時・フロア申し送り）</div></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">家族への連絡が必要な事象が発生していないか確認（日中→当日中、夜間→翌朝に報告）</div></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">職員の出退勤・体調確認</div></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">HITOマネに新しい応募が届いていないか確認（応募があれば即対応）</div></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">KANTAK-WIZ かるがも日々締めの実施確認</div></div>
+  </div>
+  <div class="cl-group" id="grp-weekly">
+    <div class="cl-head"><span>週次チェック</span><span class="cl-prog" id="prog-weekly"></span></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">案件状況の更新（高角度・低角度・見学予定の確認）</div></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">看護師・介護士への声かけ・コミュニケーション（面談機会の確保）</div></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">営業訪問の実施確認（居宅・包括・病院）</div></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">HITOマネの求人原稿ステータス確認（掲載中か・終了日は大丈夫か）</div></div>
+  </div>
+  <div class="cl-group" id="grp-monthly">
+    <div class="cl-head"><span>月次チェック</span><span class="cl-prog" id="prog-monthly"></span></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">登録者数・流入・流出の集計と翌月見込みの更新</div></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">インスペMT（7・17・27日）の準備：見込み値入力（売上・労務費・経費・流入流出）</div></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">病院訪問（最低月2回）の実施</div></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">ケアマネ書類の進捗確認（モニタリング・ケアプラン更新・支援経過入力）</div></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">加算の算定状況確認（看護体制強化加算の3指標）</div></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">未収金確認（19日前後の通知→QuickSight確認→27日前後までにスプレッドシート入力）</div></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">返戻通知確認（28日前後の通知→リーフNASで確認・対応）</div></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">運営推進会議の開催（2ヶ月に1回）</div></div>
+    <div class="cl-item" onclick="obToggle(this)"><div class="cl-check"></div><div class="cl-text">三指針委員会・各種会議の実施→会議後はインシデントレポートで議事録発信</div></div>
+  </div>
+  <button class="ob-reset" onclick="obResetAll()">すべてのチェックをリセット</button>
+
+  <h2 class="ob-sec-title">新任管理者が特に注意すること</h2>
+  <h3 class="ob-sub">失敗しやすいパターン</h3>
+  <ul class="warn-list">
+    <li class="wl-r">🔴 看護師に受け入れ判断を丸投げする → 「受け入れ不可」の回答が増える。「一緒に考える」姿勢が重要</li>
+    <li class="wl-r">🔴 ショートステイを安易に受け入れる → ベッドが埋まり本来の利用者対応ができなくなる</li>
+    <li class="wl-r">🔴 状態変化を記録のみで終わらせ家族共有をしない → クレームに発展する</li>
+    <li class="wl-r">🔴 HITOマネへの応募対応が遅れる → 採用機会を逃す。毎日チェックが必須</li>
+    <li class="wl-y">🟡 業務全体を完全に把握しようとしすぎる → 「各職種が何を抱えているか把握する姿勢」が重要</li>
+    <li class="wl-y">🟡 営業よりも先に現職員との関係構築を行う → 職員が安定しないと営業効果が出ない</li>
+    <li class="wl-y">🟡 ケアマネは1名体制のため書類が見えにくい → 意識的に書類確認・フォローを行う</li>
+    <li class="wl-b">🔵 介護士は自発的に相談しない傾向がある → 面談を意識的に設定する</li>
+    <li class="wl-b">🔵 知識量では看護師に叶わない → 知識で戦うのではなく一緒に動く</li>
+  </ul>
+  <h3 class="ob-sub">リスクが高い事項と予防策</h3>
+  <table>
+    <tr><th>リスク</th><th>予防策</th></tr>
+    <tr><td>看護師不足（8月以降も3名体制でギリギリ）</td><td>今すぐ正社員・非常勤問わず採用活動開始</td></tr>
+    <tr><td>紹介元の属人化（至誠会第二病院：小島SW一人依存）</td><td>他SWへのアプローチを開始。世田谷北部病院の新任SWへの関係構築も急務</td></tr>
+    <tr><td>ケアマネ書類の不備（実地指導での指摘・加算返戻リスク）</td><td>管理者が定期的に書類確認。フローの実施確認</td></tr>
+    <tr><td>夜間医療行為の誤受け入れ</td><td>受け入れ不可ルールを全職員に周知。吸引ケースは必ず看護師と確認</td></tr>
+    <tr><td>登録者数の急減（稼働低下→収支悪化）</td><td>案件の高角度化を促進。見学対応を積極化</td></tr>
+  </table>
+</div>
+</div>
+
+<script>
+// ══ ページ切り替え ══
+function switchPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.topnav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ══ マニュアル：スクロール ══
+function scrollTo(id){
+  const el=document.getElementById(id);
+  if(el){el.scrollIntoView({behavior:'smooth'});const navLinks=document.querySelectorAll('.nav-link');navLinks.forEach(l=>l.classList.remove('active'));const link=document.querySelector('.nav-link[href="#'+id+'"]');if(link)link.classList.add('active');}
+}
+const observer=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const id=e.target.id;document.querySelectorAll('.nav-link').forEach(l=>{l.classList.toggle('active',l.getAttribute('href')==='#'+id);});}});},{threshold:0.3,rootMargin:'-60px 0px 0px 0px'});
+document.querySelectorAll('section[id]').forEach(s=>observer.observe(s));
+
+// ══ テスト ══
+const Qs=[
+  {cat:'calendar',q:'第1営業日に必ず行う業務を全て選んでください。',multi:true,choices:['勤怠締め（15時締切）','夜勤手当・エリア手当の入力（正社員のみ）','E2入力','インスペ見込み値入力'],ans:[0,1],exp:'第1営業日は①勤怠締め（15時締切）②夜勤手当・エリア手当（正社員のみ）の入力が必須です。'},
+  {cat:'calendar',q:'インスペMT当日、10時までに「見込み値入力システム」へ入力する必要がある項目を全て選んでください。',multi:true,choices:['売上','労務費','経費','利用者の流入・流出'],ans:[0,1,2,3],exp:'見込み値入力システムへは「売上・労務費・経費・利用者の流入流出」の4項目すべてを入力します。'},
+  {cat:'calendar',q:'仮締めは何営業日目に行いますか？',choices:['第5営業日','第7営業日','第10営業日','第12営業日'],ans:2,exp:'仮締めは第10営業日です。その翌営業日が本締めになります。'},
+  {cat:'calendar',q:'インスペクションミーティングは毎月何日に開催されますか？（複数選択）',multi:true,choices:['7日','17日','27日','1日'],ans:[0,1,2],exp:'毎月7・17・27日の3回開催。13時インスペMT、17時に見込み差異確認を行います。'},
+  {cat:'calendar',q:'運営推進会議は何ヵ月に1回開催されますか？',choices:['毎月','2ヵ月に1回','3ヵ月に1回','6ヵ月に1回'],ans:1,exp:'運営推進会議は2ヵ月に1回です。'},
+  {cat:'calendar',q:'生産性向上加算に関する行政への報告は年に何回、何月に行いますか？',choices:['年2回（6月・12月）','年1回（3月）','年4回（各四半期）','年1回（4月）'],ans:1,exp:'生産性向上加算の行政報告は毎年3月に年1回行います。社内会議は3ヵ月に1回。'},
+  {cat:'role',q:'送迎表・ルート表の作成は主に誰の担当ですか？',choices:['支配人','計画作成担当者（ケアマネ）','介護主任・介護一般','看護管理者'],ans:2,exp:'送迎表とルート表は介護主任と介護一般職が毎日担当します。'},
+  {cat:'role',q:'新規受け入れ時の「契約」に関わる職種を全て選んでください。',multi:true,choices:['支配人','計画作成担当者','介護主任','看護管理者'],ans:[0,1,2],exp:'新規契約は支配人・計画作成担当者・介護主任が関与します。'},
+  {cat:'role',q:'KANTAK-WIZの「かるがも日々締め」を毎日行う職種はどれですか？（複数選択）',multi:true,choices:['支配人','介護主任','介護一般','介護非常勤'],ans:[0,1,2,3],exp:'かるがも日々締めは支配人・介護主任・介護一般・介護非常勤の全員が毎日行います。'},
+  {cat:'role',q:'新入社員のオリエンテーションは誰が担当しますか？',choices:['支配人のみ','支配人と介護主任','計画作成担当者と介護主任','看護管理者と支配人'],ans:1,exp:'オリエンテーションは支配人と介護主任が担当します。'},
+  {cat:'role',q:'現在の勤怠管理の体制として正しい説明はどれですか？',choices:['全員の勤怠を支配人が一括管理する','看護師全般の勤怠は看護管理者が管理する','介護主任は正社員・非常勤すべての勤怠を管理する','非常勤の勤怠管理は支配人が単独で行う'],ans:1,exp:'看護師全般の勤怠は看護管理者が管理します。介護主任は現状「非常勤介護士」のみ担当。'},
+  {cat:'inspect',q:'インスペMTで確認する売上の内訳として正しいものはどれですか？（複数選択）',multi:true,choices:['介護保険料','自費（食費・宿泊費）','加算','職員の賞与'],ans:[0,1,2],exp:'インスペで確認する売上は介護保険料・自費・加算の3つです。'},
+  {cat:'inspect',q:'看護体制強化加算を毎月確認する3つの指標として正しいものはどれですか？',choices:['特別管理加算・緊急対応加算・指示書発行率','特別管理加算・夜間対応件数・指示書発行率','緊急対応加算・訪問頻度・夜勤回数','指示書発行率・看護師数・ターミナル件数'],ans:0,exp:'看護体制強化加算の要件は①特別管理加算 ②緊急対応加算 ③指示書発行率の3指標です。確認は加算管理ダッシュボード（https://yst-nakamura.github.io/-/ ／ID：yst0001）で行います。KANTAK-WIZには加算情報は入っていないため注意。'},
+  {cat:'inspect',q:'E2（ProActive E2）にアクセスするにはどこから開きますか？',choices:['ガルーンのリンク集「ProActive E2（PA E2）」から開く','ブックマークから直接URLを入力する','KANTAK-WIZのメニューから遷移する','社内ポータルのトップページから開く'],ans:0,exp:'E2はガルーンのリンク集にある「ProActive E2（PA E2）」から開きます。'},
+  {cat:'inspect',q:'経費の確認に使う2つの方法として正しいものを選んでください。',multi:true,choices:['E2からPLを出力して確認する','ガルーン→ファイル管理→やさしい手→予見差異分析会議→E2管理会計データ（4階層・5階層）の本締めデータを参照する','KANTAK-WIZの月次レポートから確認する','総勘定元帳を紙で出力して確認する'],ans:[0,1],exp:'経費確認は①E2からPLを出力 ②ガルーン→予見差異分析会議→E2管理会計データの4・5階層本締めデータ参照の2つです。'},
+  {cat:'risk',q:'夜間（18時〜翌9時）に受け入れできないケースの基準として正しいものはどれですか？',choices:['夜間に家族が連絡できないケース','夜間に医療行為が頻回に必要なケース','夜間に排泄介助が複数回必要なケース','夜間に認知症の周辺症状が出やすいケース'],ans:1,exp:'18時〜翌9時に頻回な医療行為が必要なケースは受け入れ不可です。'},
+  {cat:'risk',q:'クレームになった場合、最初に行うべき対応として正しい順番はどれですか？',choices:['本社に報告→エリア長へ連絡→拠点内で対応役を決める','拠点内で対応役（職種）を確認→エリア長に即報告','エリア長に即報告→本社承認を待って対応','まず書面で謝罪→拠点内で原因調査'],ans:1,exp:'まず拠点内で対応する職種を確認し、その後すぐエリア長に報告します。'},
+  {cat:'risk',q:'ショートステイ（短期入所）の受け入れ方針として正しいものはどれですか？',choices:['医療行為があっても積極的に受け入れる','相談があれば原則全て受け入れる','基本的に受け入れない。その後の登録につながりそうな場合のみ検討する','ショートステイ専用のベッドを確保して対応する'],ans:2,exp:'ショートのみの相談は基本受け入れません。ベッドが埋まると登録利用者の緊急宿泊・新規受け入れができなくなります。'},
+  {cat:'risk',q:'利用者の状態変化を発見した場合の対応として正しいものはどれですか？',multi:true,choices:['発見時にその場にいる介護・看護・ケアマネ・支配人で即時所内共有する','日中発見した場合はその日のうちに家族へ報告する','夜間帯に発見した場合は翌朝に家族へ報告する','週1回のモニタリング時にまとめて家族へ報告する'],ans:[0,1,2],exp:'①発見時に所内共有 ②日中発見→その日のうちに家族報告 ③夜間帯発見→翌朝に家族報告。まとめてモニタリング時はNGです。'},
+  {cat:'risk',q:'受け入れに迷う吸引ケースの判断手順として正しいものはどれですか？',choices:['看護師に判断を委ねて支配人は関与しない','病院での夜間吸引頻度と実際に引けているかを確認し、迷う場合は看護師と共に面会して直接確認する','吸引があるケースは一律受け入れ不可とする','家族の意向だけを聞いて判断する'],ans:1,exp:'夜間吸引頻度と「実際に引けているか」を確認します。迷う場合は看護師と共に病院へ面会に行き直接確認します。'},
+  {cat:'uncollected',q:'かんたきで未収金が発生しやすい主な原因を全て選んでください。',multi:true,choices:['区分変更申請中の保険請求停止','加算の付け誤り（重複算定など）','居宅届出の遅れ','利用者の引っ越し'],ans:[0,1,2],exp:'主な原因は①区分変更申請中 ②加算の付け誤り ③居宅届出の遅れの3つです。'},
+  {cat:'uncollected',q:'月途中で他サービスからかんたきに移行した際に最も起きやすい加算の付け誤りはどれですか？',choices:['総合マネジメント加算の二重算定','緊急時訪問看護加算の二重算定（移行前の訪問看護と同月に算定）','看護体制強化加算の算定漏れ','特別管理加算の重複請求'],ans:1,exp:'緊急時訪問看護加算は1ヶ月1事業所のみ算定可能。移行前の訪問看護での算定が残ると返戻になります。'},
+  {cat:'uncollected',q:'毎月の未収金確認はどのシステムで行いますか？また通知はいつ届きますか？',choices:['KANTAK-WIZで確認。毎月1日にメール通知','QuickSightで確認。毎月19日前後にガルーンメールで通知','E2のPL画面で確認。毎月7日前後にガルーンメールで通知','リーフシステムで確認。毎月28日前後にガルーンメールで通知'],ans:1,exp:'未収金の確認はQuickSightで行います。毎月19日前後にガルーンメールで通知が届きます。'},
+  {cat:'uncollected',q:'口座引き落とし（印鑑）が戻ってきた場合の正しい対応はどれですか？',choices:['翌月に2ヶ月分まとめて引き落とすよう手続きする','すぐに利用者家族へ連絡し、未収分を即時入金してもらう','次の請求サイクルまで待って処理する','エリア長の判断を待ってから対応する'],ans:1,exp:'翌月2ヶ月分まとめて処理すると2ヶ月超未収になります。戻りが判明したらすぐ家族へ連絡し即時入金を依頼します。'},
+  {cat:'uncollected',q:'月末に新規利用者が来た場合に未収金が発生しやすい理由として正しいものはどれですか？',choices:['月末は職員が少なく契約書類の準備が間に合わないため','居宅届出の提出期限に間に合わず、翌月に請求がずれ込んでしまうため','月末は介護保険の請求ができない期間のため','区分変更申請が月末には受け付けてもらえないため'],ans:1,exp:'月末の新規受け入れは居宅届出が翌月にずれ込み、その月の請求が止まって未収になります。'},
+  {cat:'uncollected',q:'返戻通知書の確認・処理はどのシステムのどこで行いますか？',choices:['ガルーンのメール添付ファイルをそのまま処理する','リーフNASシステム（yst-doc.com）の所定フォルダを確認する','QuickSightの返戻タブで確認する','KANTAK-WIZの請求画面で確認する'],ans:1,exp:'返戻通知書はリーフNASシステムに格納。看護・SSは「104_看護入浴SS → 01_返戻・支払決定通知フォルダ → XXXX審査」。毎月28日前後にガルーンメールで通知されます。'},
+  {cat:'uncollected',q:'未収金入力用スプレッドシートへの入力期限はいつですか？',choices:['毎月10日まで','毎月19日前後（通知が届いたらすぐ）','毎月27日前後まで','毎月末日まで'],ans:2,exp:'未収金入力用スプレッドシートへの入力期限は毎月27日前後です。'},
+  {cat:'system',q:'zooシステム（yst-sso.com）からログインできるシステムを全て選んでください。',multi:true,choices:['BCP（事業継続計画）関連システム','インシデントレポート','オーシャン','KANTAK-WIZ'],ans:[0,1,2],exp:'zooシステムはSSOポータルで、BCP・インシデントレポート・オーシャンなどにログインできます。'},
+  {cat:'system',q:'三指針BCP会議を行った後、議事録はどこで発信しますか？',choices:['ガルーンの掲示板に投稿する','インシデントレポート（yst-incident.com）で会議区分を選択して申請する','専用のスプレッドシートに直接入力する','エリア長にメールで送付する'],ans:1,exp:'三指針BCP会議の議事録はインシデントレポートから「インシデントレポート作成」→「申請区分」で該当会議の区分を選択して申請します。'},
+  {cat:'system',q:'三指針BCP会議チェックシートはどこで管理されていますか？',choices:['zooシステム内のファイル管理','Googleスプレッドシート（年間スケジュールと同じシート）','リーフNASシステム内','ガルーンのファイル管理内'],ans:1,exp:'三指針BCP会議チェックシートはGoogleスプレッドシートで管理されています。'},
+  {cat:'recruit',q:'HITOマネで支配人が対応する採用区分はどれですか？',choices:['正社員のみ','非常勤のみ','正社員・非常勤どちらも支配人が対応する','正社員は人事課とエリア長、非常勤は支配人が対応する'],ans:3,exp:'正社員の採用対応は人事課とエリア長が行い、非常勤の採用対応は支配人が行います。'},
+  {cat:'recruit',q:'HITOマネへの応募があった場合、支配人はどのように対応すべきですか？',choices:['週1回まとめて確認し、返信する','エリア長に報告してから対応する','毎日チェックし、応募があれば即時対応して面接アポを取る','応募があれば翌営業日に対応する'],ans:2,exp:'HITOマネは毎日チェックが必要です。応募があれば即時対応して面接のアポイントを取ります。'},
+  {cat:'recruit',q:'自拠点の採用枠が充足している場合の応募者への対応として正しいものはどれですか？',choices:['そのまま採用見送りの連絡をする','近隣の事業所の空きを確認して応募者に提案する','エリア長に全て委ねる','応募ステータスをそのまま放置する'],ans:1,exp:'自拠点が充足していても、近隣事業所の空きを確認して応募者に提案します。'},
+  {cat:'recruit',q:'HITOマネの「募集管理（求人原稿）」で必ず確認すべき項目を全て選んでください。',multi:true,choices:['原稿のステータスが【掲載】か【非掲載】か','求人の開始日と終了日','応募者の氏名と連絡先','掲載媒体の費用'],ans:[0,1],exp:'募集管理では①ステータスが【掲載】か【非掲載】か ②開始日と終了日を必ず確認します。終了・非掲載は速やかに修正が必要です。'},
+];
+let tState={answered:{},correct:0,currentCat:'all'};
+let tMulti={};
+function getFiltered(){return tState.currentCat==='all'?Qs:Qs.filter(q=>q.cat===tState.currentCat);}
+function updateTestScore(){
+  const total=Object.keys(tState.answered).length;
+  document.getElementById('t-score').textContent=tState.correct+'/'+total;
+  document.getElementById('t-pbar').style.width=(total/Qs.length*100)+'%';
+  document.getElementById('t-pbar-lbl').textContent=total+' / '+Qs.length+'問 回答済み';
+  const fc=getFiltered();
+  if(fc.filter(q=>tState.answered[Qs.indexOf(q)]!==undefined).length===fc.length&&fc.length>0)showResult();
+}
+function showResult(){
+  document.getElementById('result-panel').classList.add('show');
+  const total=Object.keys(tState.answered).length;
+  const pct=total>0?Math.round(tState.correct/total*100):0;
+  document.getElementById('r-score').textContent=pct+'%';
+  document.getElementById('r-correct').textContent=tState.correct+'/'+total;
+  document.getElementById('r-pct').textContent=pct+'%';
+  let grade,msg;
+  if(pct>=90){grade='S評価　合格';msg='業務への深い理解があります。新任管理者として即戦力が期待できます。';}
+  else if(pct>=75){grade='A評価　合格';msg='良好な理解度です。不正解の項目を確認して理解を深めましょう。';}
+  else if(pct>=60){grade='B評価　要復習';msg='基本は理解できています。特にリスク判断・未収金系を重点的に復習してください。';}
+  else{grade='C評価　要再学習';msg='マニュアルを再確認してから、もう一度挑戦してください。';}
+  document.getElementById('r-grade').textContent=grade;
+  document.getElementById('r-msg').textContent=msg;
+}
+function resetTest(){
+  tState={answered:{},correct:0,currentCat:tState.currentCat};tMulti={};
+  document.getElementById('result-panel').classList.remove('show');
+  document.getElementById('t-pbar').style.width='0%';
+  document.getElementById('t-pbar-lbl').textContent='0 / '+Qs.length+'問 回答済み';
+  document.getElementById('t-score').textContent='0/0';
+  renderQuestions();
+}
+function filterCat(cat){
+  tState.currentCat=cat;
+  const labels={all:'すべて',calendar:'月次',role:'役割',inspect:'インスペ',risk:'リスク',uncollected:'未収金',system:'システム',recruit:'採用'};
+  document.querySelectorAll('.cat-tab').forEach(t=>{t.classList.toggle('active',Object.entries(labels).some(([k,v])=>cat===k&&t.textContent.includes(v)));});
+  document.getElementById('q-count').textContent=getFiltered().length+'問';
+  document.getElementById('result-panel').classList.remove('show');
+  renderQuestions();
+}
+function getCC(q,qi,ci){if(q.multi)return q.ans.includes(ci)?' correct':' disabled';if(ci===q.ans)return ' correct';if(tState.answered[qi]===ci)return ' wrong';return ' disabled';}
+function getIco(q,qi,ci){if(q.multi)return q.ans.includes(ci)?'✓':'';if(ci===q.ans)return '✓';if(tState.answered[qi]===ci)return '✗';return '';}
+const bm={calendar:'qb-calendar',role:'qb-role',inspect:'qb-inspect',risk:'qb-risk',uncollected:'qb-uncollected',system:'qb-system',recruit:'qb-recruit'};
+const lm={calendar:'月次業務',role:'役割分担',inspect:'インスペ・加算',risk:'リスク・判断',uncollected:'未収金・返戻',system:'システム・会議',recruit:'採用管理'};
+function renderQuestions(){
+  const container=document.getElementById('q-container');container.innerHTML='';
+  getFiltered().forEach((q,fi)=>{
+    const qi=Qs.indexOf(q);const card=document.createElement('div');card.className='q-card'+(tState.answered[qi]!==undefined?' answered':'');card.id='qcard-'+qi;
+    card.innerHTML=`<span class="q-badge ${bm[q.cat]}">${lm[q.cat]}${q.multi?' ／ 複数選択':''}</span><div class="q-text">Q${fi+1}. ${q.q}</div><div class="choices" id="choices-${qi}">${q.choices.map((c,ci)=>`<div class="choice${tState.answered[qi]!==undefined?getCC(q,qi,ci):''}" id="c-${qi}-${ci}" onclick="handleChoice(${qi},${ci})"><span class="choice-icon" id="ci-${qi}-${ci}">${tState.answered[qi]!==undefined?getIco(q,qi,ci):''}</span>${c}</div>`).join('')}</div><div class="exp${tState.answered[qi]!==undefined?' show':''}" id="exp-${qi}">${q.exp}</div>`;
+    container.appendChild(card);
+    if(q.multi&&!tMulti[qi])tMulti[qi]=new Set();
+    if(q.multi&&tState.answered[qi]===undefined){const btn=document.createElement('button');btn.className='submit-btn';btn.id='submit-'+qi;btn.textContent='回答する';btn.onclick=()=>submitMulti(qi);card.appendChild(btn);}
+  });
+}
+function handleChoice(qi,ci){
+  const q=Qs[qi];if(tState.answered[qi]!==undefined)return;
+  if(q.multi){if(!tMulti[qi])tMulti[qi]=new Set();const el=document.getElementById('c-'+qi+'-'+ci);if(tMulti[qi].has(ci)){tMulti[qi].delete(ci);el.classList.remove('selected');}else{tMulti[qi].add(ci);el.classList.add('selected');}return;}
+  tState.answered[qi]=ci;if(ci===q.ans)tState.correct++;
+  q.choices.forEach((_,i)=>{const el=document.getElementById('c-'+qi+'-'+i);const ico=document.getElementById('ci-'+qi+'-'+i);if(i===q.ans){el.classList.add('correct');ico.textContent='✓';}else if(i===ci&&ci!==q.ans){el.classList.add('wrong');ico.textContent='✗';}else el.classList.add('disabled');});
+  document.getElementById('exp-'+qi).classList.add('show');document.getElementById('qcard-'+qi).classList.add('answered');updateTestScore();
+}
+function submitMulti(qi){
+  const q=Qs[qi];if(!tMulti[qi]||tMulti[qi].size===0)return;
+  const sel=Array.from(tMulti[qi]).sort();const correct=[...q.ans].sort();
+  tState.answered[qi]=sel;if(sel.length===correct.length&&sel.every((v,i)=>v===correct[i]))tState.correct++;
+  q.choices.forEach((_,i)=>{const el=document.getElementById('c-'+qi+'-'+i);const ico=document.getElementById('ci-'+qi+'-'+i);if(correct.includes(i)){el.classList.add('correct');ico.textContent='✓';}else if(sel.includes(i)){el.classList.add('wrong');ico.textContent='✗';}else el.classList.add('disabled');});
+  document.getElementById('exp-'+qi).classList.add('show');document.getElementById('qcard-'+qi).classList.add('answered');
+  const sb=document.getElementById('submit-'+qi);if(sb)sb.remove();updateTestScore();
+}
+renderQuestions();
+document.getElementById('q-count').textContent=Qs.length+'問';
+document.getElementById('t-pbar-lbl').textContent='0 / '+Qs.length+'問 回答済み';
+
+// ══ 新任管理者パック ══
+function obToggle(el){el.classList.toggle('done');el.querySelector('.cl-check').textContent=el.classList.contains('done')?'✓':'';obSave();obUpdateProgress();}
+function obSave(){const items=document.querySelectorAll('#page-onboard .cl-item');const s=Array.from(items).map(i=>i.classList.contains('done'));try{localStorage.setItem('kaerie_ob',JSON.stringify(s));}catch(e){}}
+function obLoad(){try{const s=JSON.parse(localStorage.getItem('kaerie_ob'));if(!s)return;const items=document.querySelectorAll('#page-onboard .cl-item');items.forEach((item,i)=>{if(s[i]){item.classList.add('done');item.querySelector('.cl-check').textContent='✓';}});}catch(e){}}
+function obUpdateProgress(){
+  const all=document.querySelectorAll('#page-onboard .cl-item');
+  const done=document.querySelectorAll('#page-onboard .cl-item.done');
+  const pct=all.length>0?Math.round(done.length/all.length*100):0;
+  document.getElementById('ob-pbar').style.width=pct+'%';
+  document.getElementById('ob-prog-txt').textContent=done.length+' / '+all.length+' 完了';
+  [['grp-hikisugi','prog-hikisugi'],['grp-daily','prog-daily'],['grp-weekly','prog-weekly'],['grp-monthly','prog-monthly']].forEach(([gid,pid])=>{
+    const g=document.getElementById(gid);if(!g)return;
+    const el=document.getElementById(pid);if(el)el.textContent=g.querySelectorAll('.cl-item.done').length+'/'+g.querySelectorAll('.cl-item').length;
+  });
+  const byTag=(cls)=>{const all2=Array.from(document.querySelectorAll('#page-onboard .cl-item')).filter(i=>i.querySelector(cls));return{total:all2.length,done:all2.filter(i=>i.classList.contains('done')).length};};
+  const u=byTag('.t-urgent'),f=byTag('.t-first'),m=[...document.querySelectorAll('#page-onboard .cl-item')].filter(i=>i.querySelector('.t-month')||i.querySelector('.t-week'));
+  document.getElementById('p-urgent').textContent=u.done+'/'+u.total;
+  document.getElementById('p-first').textContent=f.done+'/'+f.total;
+  document.getElementById('p-month').textContent=m.filter(i=>i.classList.contains('done')).length+'/'+m.length;
+}
+function obResetAll(){if(confirm('すべてのチェックをリセットしますか？')){document.querySelectorAll('#page-onboard .cl-item').forEach(i=>{i.classList.remove('done');i.querySelector('.cl-check').textContent='';});try{localStorage.removeItem('kaerie_ob');}catch(e){}obUpdateProgress();}}
+obLoad();obUpdateProgress();
+</script>
+</body>
+</html>
